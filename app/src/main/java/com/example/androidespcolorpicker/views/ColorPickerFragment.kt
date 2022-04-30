@@ -3,22 +3,25 @@ package com.example.androidespcolorpicker.views
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
+import android.graphics.BlendMode
+import android.graphics.BlendModeColorFilter
 import android.graphics.Color
+import android.graphics.PorterDuff
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TableLayout
-import android.widget.Toast
+import android.widget.*
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.androidespcolorpicker.R
 import com.example.androidespcolorpicker.helpers.NetworkManager
 import com.example.androidespcolorpicker.viewmodels.MainActivityViewModel
-import top.defaults.colorpicker.ColorPickerView
+import com.madrapps.pikolo.ColorPicker
+import com.madrapps.pikolo.listeners.SimpleColorSelectionListener
+
 
 //TODO retain last used color in sharedPrefs, instantiate ColorPicker with it
 class ColorPickerFragment : Fragment() {
@@ -40,7 +43,7 @@ class ColorPickerFragment : Fragment() {
     private lateinit var saveBtn: Button
     private lateinit var ipTextView: EditText
     private lateinit var colorTableLayout: TableLayout
-    private lateinit var colorPickerView: ColorPickerView
+    private lateinit var clrImageView: ImageView
 
     private var orientation: Int? = null
 
@@ -55,8 +58,7 @@ class ColorPickerFragment : Fragment() {
     }
 
     private fun updatePicker() {
-        colorPickerView.setInitialColor(thisFragment.getColorFromRawRGB())
-        colorPickerView.reset()
+
     }
 
     private fun attachTextColorListeners() {
@@ -119,7 +121,7 @@ class ColorPickerFragment : Fragment() {
         saveBtn = view.findViewById(R.id.saveButton)
         ipTextView = view.findViewById(R.id.ipTextView)
         colorTableLayout = view.findViewById(R.id.colorValuesTable)
-        colorPickerView = view.findViewById(R.id.colorPicker)
+        clrImageView = view.findViewById(R.id.clrImageView)
 
         rText = view.findViewById(R.id.rText)
         gText = view.findViewById(R.id.gText)
@@ -173,13 +175,25 @@ class ColorPickerFragment : Fragment() {
 
         fetchXmlElements(view)
 
+        val colorPicker: ColorPicker = view.findViewById(R.id.colorPicker)
+        colorPicker.setColorSelectionListener(object : SimpleColorSelectionListener() {
+            override fun onColorSelected(color: Int) {
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                    clrImageView.background.colorFilter =
+                        BlendModeColorFilter(color, BlendMode.MULTIPLY)
+                else
+                    clrImageView.background.setColorFilter(color, PorterDuff.Mode.MULTIPLY)
+
+                setColor(color)
+            }
+        })
+
         sharedPrefs = requireContext().getSharedPreferences("ipPref", Context.MODE_PRIVATE)
         val ipFromSharedPrefs = sharedPrefs.getString(R.string.IP.toString(), "")
 
         ipTextView.setText(ipFromSharedPrefs)
         networkManager.ip = ipFromSharedPrefs!!
-
-        colorPickerView.setInitialColor(Color.MAGENTA)
 
         attachTextColorListeners()
 
@@ -196,9 +210,9 @@ class ColorPickerFragment : Fragment() {
         }
 
         //send post to esp with the color data when color changes
-        colorPickerView.subscribe { color: Int, fromUser: Boolean, shouldPropagate: Boolean ->
+        /*colorPickerView.subscribe { color: Int, fromUser: Boolean, shouldPropagate: Boolean ->
             setColor(color)
-        }
+        }*/
 
     }
 

@@ -7,104 +7,114 @@
     android:orientation="horizontal"
     tools:context=".views.MainActivity">
 
-    <top.defaults.colorpicker.ColorPickerView
+    <com.madrapps.pikolo.HSLColorPicker
         android:id="@+id/colorPicker"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        app:enableAlpha="false"
-        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/panel"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <FrameLayout
-        android:id="@+id/xFrame"
-        android:layout_width="0dp"
+    <ImageView
+        android:id="@+id/clrImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/bg_circle"
+        app:layout_constraintBottom_toBottomOf="@+id/colorPicker"
+        app:layout_constraintEnd_toEndOf="@+id/colorPicker"
+        app:layout_constraintStart_toStartOf="@+id/colorPicker"
+        app:layout_constraintTop_toTopOf="@+id/colorPicker"
+        tools:ignore="ContentDescription" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/panel"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/colorPicker"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <Button
+            android:id="@+id/saveButton"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="70dp"
+            android:shadowColor="#000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="5"
+            android:text="save"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
-                android:id="@+id/saveButton"
-                android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:shadowColor="#000000"
-                android:shadowDx="2"
-                android:shadowDy="2"
-                android:shadowRadius="5"
-                android:text="save"
-                android:textColor="@color/white"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <Button
+            android:id="@+id/FFTButton"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:shadowColor="#000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="5"
+            android:text="FFT"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/saveButton" />
 
-            <Button
-                android:id="@+id/FFTButton"
-                android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:shadowColor="#000000"
-                android:shadowDx="2"
-                android:shadowDy="2"
-                android:shadowRadius="5"
-                android:text="FFT"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/saveButton" />
+        <EditText
+            android:id="@+id/ipTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="enter IP address"
+            android:inputType="text"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/FFTButton" />
 
-            <EditText
-                android:id="@+id/ipTextView"
+        <TableLayout
+            android:id="@+id/colorValuesTable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ipTextView">
+
+            <TableRow
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:hint="enter IP address"
-                android:inputType="text"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/FFTButton" />
+                android:layout_height="wrap_content">
 
-            <TableLayout
-                android:id="@+id/colorValuesTable"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ipTextView">
-
-                <TableRow
+                <EditText
+                    android:id="@+id/rText"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:inputType="numberSigned"
+                    android:maxLength="3" />
 
-                    <EditText
-                        android:id="@+id/rText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:inputType="numberSigned"
-                        android:maxLength="3" />
+                <EditText
+                    android:id="@+id/gText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberSigned"
+                    android:maxLength="3" />
 
-                    <EditText
-                        android:id="@+id/gText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:inputType="numberSigned"
-                        android:maxLength="3" />
+                <EditText
+                    android:id="@+id/bText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberSigned"
+                    android:maxLength="3" />
 
-                    <EditText
-                        android:id="@+id/bText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:inputType="numberSigned"
-                        android:maxLength="3" />
-
-                </TableRow>
-            </TableLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </FrameLayout>
+            </TableRow>
+        </TableLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

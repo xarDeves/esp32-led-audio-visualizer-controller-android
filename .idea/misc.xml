@@ -16,10 +16,13 @@
         <entry key="..\:/Users/chnte/Desktop/Programming/led audio visualiser (esp)/app/src/main/res/layout/activity_main.xml" value="0.33469202898550726" />
         <entry key="..\:/Users/chnte/Desktop/Programming/led audio visualiser (esp)/led strip controller widget (android)/app/src/main/res/layout/activity_main.xml" value="0.3052536231884058" />
         <entry key="..\:/Users/chnte/Desktop/Programming/led audio visualiser (esp)/led strip controller widget (android)/app/src/main/res/layout/fragment_color_picker.xml" value="0.19610507246376813" />
+        <entry key="app/src/main/res/drawable/bg_cirlce.xml" value="0.1995" />
+        <entry key="app/src/main/res/layout-land/fragment_color_picker.xml" value="0.2" />
+        <entry key="app/src/main/res/layout/fragment_color_picker.xml" value="0.18070652173913043" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
