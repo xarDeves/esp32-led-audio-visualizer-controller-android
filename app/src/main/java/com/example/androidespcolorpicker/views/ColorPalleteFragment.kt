@@ -45,12 +45,8 @@ class ColorPalleteFragment : Fragment() {
     }
 
     fun changeAdapterButtonState() {
-        if (palleteAdapter.toggled) palleteAdapter.changeAllButtonsState()
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(requireActivity())[MainActivityViewModel::class.java]
+        if (this::palleteAdapter.isInitialized)
+            if (palleteAdapter.toggled) palleteAdapter.changeAllButtonsState()
     }
 
     override fun onCreateView(
@@ -61,6 +57,11 @@ class ColorPalleteFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_color_pallete, container, false)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(requireActivity())[MainActivityViewModel::class.java]
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -68,10 +69,8 @@ class ColorPalleteFragment : Fragment() {
 
         val recyclerView: RecyclerView = view.findViewById(R.id.colorsRecycler)
         palleteAdapter = PalleteRecyclerAdapter(requireActivity(), this, viewModel.data.value!!)
-
         //divider = inflated view's overall width
         val gridLayoutManager = GridLayoutManager(requireActivity(), getGridColumnCount(95))
-
         recyclerView.layoutManager = gridLayoutManager
         recyclerView.adapter = palleteAdapter
 

@@ -9,8 +9,6 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androidespcolorpicker.R
 import com.example.androidespcolorpicker.views.ColorPalleteFragment
-import com.example.androidespcolorpicker.views.ColorPickerFragment
-
 
 class PalleteRecyclerAdapter internal constructor(
     private val context: Context,
@@ -20,6 +18,8 @@ class PalleteRecyclerAdapter internal constructor(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var inflatedButtons: ArrayList<ColorButtonViewHolder> = arrayListOf()
+
+    //FIXME resets on orientation change
     var toggled = false
 
     inner class ColorButtonViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -36,8 +36,8 @@ class PalleteRecyclerAdapter internal constructor(
 
         init {
             colorButton.setOnClickListener {
-                //FIXME change to callback, deprecate companion object
-                if (!toggled) ColorPickerFragment.Companion.update(rawColor!!)
+                //FIXME change to callback
+                //if (!toggled) viewModel.fragments[0].update(rawColor!!)
                 toggleImageButton.isActivated = thisToggled
                 thisToggled = thisToggled != true
             }

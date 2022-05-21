@@ -27,7 +27,6 @@ class NetworkManager(context: Context) {
         myRequestQueue.add(myStringRequest)
     }
 
-    //FIXME green and blue are inverted
     fun sendColorPost(r: String, g: String, b: String) {
         val myStringRequest: StringRequest = object : StringRequest(
             Method.POST,

@@ -2,7 +2,6 @@ package com.example.androidespcolorpicker.views
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.res.Configuration
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
 import android.graphics.Color
@@ -23,13 +22,16 @@ import com.madrapps.pikolo.ColorPicker
 import com.madrapps.pikolo.listeners.SimpleColorSelectionListener
 
 
-//TODO retain last used color in sharedPrefs, instantiate ColorPicker with it
+//TODO retain last used color in sharedPrefs, instantiate color picker with it.
+// Also feed data to color picker's image view
 class ColorPickerFragment : Fragment() {
 
     private lateinit var viewModel: MainActivityViewModel
 
     private lateinit var sharedPrefs: SharedPreferences
     private lateinit var networkManager: NetworkManager
+
+    private var colorRaw: Int = 0
 
     private lateinit var colorG: String
     private lateinit var colorR: String
@@ -47,13 +49,11 @@ class ColorPickerFragment : Fragment() {
 
     private var orientation: Int? = null
 
-    private fun setColor(color: Int) {
-        updateColors(color)
-        fftBtn.setBackgroundColor(color)
-        saveBtn.setBackgroundColor(color)
-        //FIXME this breaks everything on horizontal orientation
-        if (orientation == Configuration.ORIENTATION_PORTRAIT)
-            setTextFieldValues()
+    private fun updateState() {
+        updateColors()
+        fftBtn.setBackgroundColor(colorRaw)
+        saveBtn.setBackgroundColor(colorRaw)
+        setTextFieldValues()
         networkManager.sendColorPost(colorR, colorG, colorB)
     }
 
@@ -128,10 +128,10 @@ class ColorPickerFragment : Fragment() {
         bText = view.findViewById(R.id.bText)
     }
 
-    private fun updateColors(color: Int) {
-        colorR = Color.red(color).toString()
-        colorG = Color.green(color).toString()
-        colorB = Color.blue(color).toString()
+    private fun updateColors() {
+        colorR = Color.red(colorRaw).toString()
+        colorG = Color.green(colorRaw).toString()
+        colorB = Color.blue(colorRaw).toString()
     }
 
     private fun setTextFieldValues() {
@@ -147,14 +147,6 @@ class ColorPickerFragment : Fragment() {
         }
     }
 
-    private fun getColorFromRawRGB(): Int {
-        return Color.rgb(
-            colorR.toInt(),
-            colorG.toInt(),
-            colorB.toInt()
-        )
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(requireActivity())[MainActivityViewModel::class.java]
@@ -164,7 +156,6 @@ class ColorPickerFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Companion.setContext(this)
         networkManager = NetworkManager(requireActivity())
         orientation = requireActivity().resources.configuration.orientation
         return inflater.inflate(R.layout.fragment_color_picker, container, false)
@@ -185,7 +176,8 @@ class ColorPickerFragment : Fragment() {
                 else
                     clrImageView.background.setColorFilter(color, PorterDuff.Mode.MULTIPLY)
 
-                setColor(color)
+                colorRaw = color
+                updateState()
             }
         })
 
@@ -203,31 +195,12 @@ class ColorPickerFragment : Fragment() {
         }
 
         saveBtn.setOnClickListener {
-            viewModel.data.value!!.add(getColorFromRawRGB())
+            viewModel.data.value!!.add(colorRaw)
             viewModel.data.postValue(viewModel.data.value)
 
             Toast.makeText(requireContext(), "Color Saved Successfully", Toast.LENGTH_SHORT).show()
         }
 
-        //send post to esp with the color data when color changes
-        /*colorPickerView.subscribe { color: Int, fromUser: Boolean, shouldPropagate: Boolean ->
-            setColor(color)
-        }*/
-
-    }
-
-    companion object {
-
-        private lateinit var thisFragment: ColorPickerFragment
-
-        fun setContext(fragment: ColorPickerFragment) {
-            thisFragment = fragment
-        }
-
-        fun update(color: Int) {
-            thisFragment.setColor(color)
-            thisFragment.updatePicker()
-        }
     }
 
 }

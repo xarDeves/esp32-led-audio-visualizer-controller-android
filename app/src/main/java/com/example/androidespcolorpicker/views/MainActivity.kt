@@ -3,9 +3,8 @@ package com.example.androidespcolorpicker.views
 import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.example.androidespcolorpicker.R
 import com.example.androidespcolorpicker.adapters.MainViewPagerAdapter
@@ -15,8 +14,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: MainActivityViewModel
-    private lateinit var fragments: Array<Fragment>
+    val viewModel: MainActivityViewModel by viewModels()
 
     private lateinit var viewPager: ViewPager2
     private lateinit var adapter: MainViewPagerAdapter
@@ -31,18 +29,13 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
 
-    /*private fun initializeData() {
-        Database.setFilesDir(this.filesDir)
-        Database.read()
-    }*/
-
     private fun fetchXmlElements() {
         viewPager = findViewById(R.id.viewPager)
         tabLayout = findViewById(R.id.tabLayout)
     }
 
     private fun setupViewPager() {
-        adapter = MainViewPagerAdapter(fragments, this)
+        adapter = MainViewPagerAdapter(viewModel.fragments, this)
         viewPager.adapter = adapter
         viewPager.isUserInputEnabled = false
     }
@@ -61,13 +54,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         supportActionBar!!.hide()
 
-        viewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
-
-        val colorsFragment = ColorPalleteFragment()
-        val colorPickerFragment = ColorPickerFragment()
-
-        fragments = arrayOf(colorPickerFragment, colorsFragment)
-
         val policy = ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
 
@@ -79,7 +65,7 @@ class MainActivity : AppCompatActivity() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
 
-                if (position == 0 && colorsFragment.isVisible) colorsFragment.changeAdapterButtonState()
+                (viewModel.fragments[1] as ColorPalleteFragment).changeAdapterButtonState()
             }
         })
 
