@@ -6,10 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androidespcolorpicker.R
+import com.example.androidespcolorpicker.viewmodels.MainActivityViewModel
 import com.example.androidespcolorpicker.views.ColorPalleteFragment
 
+//FIXME orientation change breaks color selection callback
+//FIXME onLongClickListener intercepts onClickListener.
+// After long click, if button was pressed, delete icon apperas
 class PalleteRecyclerAdapter internal constructor(
     private val context: Context,
     private val parentView: ColorPalleteFragment,
@@ -18,26 +23,23 @@ class PalleteRecyclerAdapter internal constructor(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var inflatedButtons: ArrayList<ColorButtonViewHolder> = arrayListOf()
-
-    //FIXME resets on orientation change
     var toggled = false
 
     inner class ColorButtonViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-        private val colorButton: Button = view.findViewById(R.id.colorButton)
-        private var thisToggled = true
+        val colorButton: Button = view.findViewById(R.id.colorButton)
+        var thisToggled = true
         val toggleImageButton: ImageView = view.findViewById(R.id.toggleButton)
-        var rawColor: Int? = null
+        var colorRaw: Int = 0
 
-        fun setColor(color: Int) {
+        /*fun setColor(color: Int) {
             this.colorButton.setBackgroundColor(color)
-            this.rawColor = color
+            this.colorRaw = color
         }
 
         init {
             colorButton.setOnClickListener {
-                //FIXME change to callback
-                //if (!toggled) viewModel.fragments[0].update(rawColor!!)
+                if (!toggled) parentView.colorChangedFromRecycler(colorRaw)
                 toggleImageButton.isActivated = thisToggled
                 thisToggled = thisToggled != true
             }
@@ -46,7 +48,7 @@ class PalleteRecyclerAdapter internal constructor(
                 changeAllButtonsState()
                 return@setOnLongClickListener true
             }
-        }
+        }*/
 
     }
 
@@ -56,7 +58,23 @@ class PalleteRecyclerAdapter internal constructor(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as ColorButtonViewHolder).setColor(data.elementAt(position))
+        /*(holder as ColorButtonViewHolder).setColor(data.elementAt(position))
+        inflatedButtons.add(holder)*/
+
+        (holder as ColorButtonViewHolder).colorButton.setBackgroundColor(data.elementAt(position))
+        holder.colorRaw = data.elementAt(position)
+
+        holder.colorButton.setOnClickListener {
+            if (!toggled) parentView.colorChangedFromRecycler(holder.colorRaw)
+            holder.toggleImageButton.isActivated = holder.thisToggled
+            holder.thisToggled = holder.thisToggled != true
+        }
+
+        holder.colorButton.setOnLongClickListener {
+            changeAllButtonsState()
+            return@setOnLongClickListener true
+        }
+
         inflatedButtons.add(holder)
     }
 
@@ -82,7 +100,7 @@ class PalleteRecyclerAdapter internal constructor(
                 view.toggleImageButton.visibility = View.INVISIBLE
                 view.toggleImageButton.isActivated = false
 
-                data.remove(view.rawColor)
+                data.remove(view.colorRaw)
                 iterator.remove()
                 index--
             }

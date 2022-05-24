@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
         adapter = MainViewPagerAdapter(viewModel.fragments, this)
         viewPager.adapter = adapter
         viewPager.isUserInputEnabled = false
+        viewPager.offscreenPageLimit = 2
     }
 
     private fun setupTabs() {

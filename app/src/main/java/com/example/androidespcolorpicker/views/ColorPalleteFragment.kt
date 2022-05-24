@@ -49,11 +49,14 @@ class ColorPalleteFragment : Fragment() {
             if (palleteAdapter.toggled) palleteAdapter.changeAllButtonsState()
     }
 
+    fun colorChangedFromRecycler(color : Int){
+        viewModel.colorChangedFromPallete(color)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         return inflater.inflate(R.layout.fragment_color_pallete, container, false)
     }
 

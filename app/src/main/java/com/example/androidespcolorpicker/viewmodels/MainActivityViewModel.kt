@@ -25,4 +25,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         db.write(data)
     }
 
+    fun colorChangedFromPallete(color : Int){
+        (fragments[0] as ColorPickerFragment).updateFromExternal(color)
+    }
+
 }

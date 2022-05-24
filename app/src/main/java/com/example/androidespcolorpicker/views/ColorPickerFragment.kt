@@ -1,7 +1,6 @@
 package com.example.androidespcolorpicker.views
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
 import android.graphics.Color
@@ -20,18 +19,16 @@ import com.example.androidespcolorpicker.helpers.NetworkManager
 import com.example.androidespcolorpicker.viewmodels.MainActivityViewModel
 import com.madrapps.pikolo.ColorPicker
 import com.madrapps.pikolo.listeners.SimpleColorSelectionListener
+import kotlin.properties.Delegates
 
 
-//TODO retain last used color in sharedPrefs, instantiate color picker with it.
-// Also feed data to color picker's image view
 class ColorPickerFragment : Fragment() {
 
     private lateinit var viewModel: MainActivityViewModel
-
-    private lateinit var sharedPrefs: SharedPreferences
     private lateinit var networkManager: NetworkManager
+    private lateinit var colorPicker: ColorPicker
 
-    private var colorRaw: Int = 0
+    private var colorRaw by Delegates.notNull<Int>()
 
     private lateinit var colorG: String
     private lateinit var colorR: String
@@ -48,18 +45,6 @@ class ColorPickerFragment : Fragment() {
     private lateinit var clrImageView: ImageView
 
     private var orientation: Int? = null
-
-    private fun updateState() {
-        updateColors()
-        fftBtn.setBackgroundColor(colorRaw)
-        saveBtn.setBackgroundColor(colorRaw)
-        setTextFieldValues()
-        networkManager.sendColorPost(colorR, colorG, colorB)
-    }
-
-    private fun updatePicker() {
-
-    }
 
     private fun attachTextColorListeners() {
         rText.setOnFocusChangeListener { view, _ ->
@@ -105,7 +90,7 @@ class ColorPickerFragment : Fragment() {
                 if (colorB.length == 3) {
 
                     colorTableLayout.clearFocus()
-                    updatePicker()
+                    updatePickerImage()
                 }
             }
         }
@@ -141,10 +126,66 @@ class ColorPickerFragment : Fragment() {
     }
 
     private fun saveIpToPrefs() {
+        val sharedPrefs = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
         with(sharedPrefs.edit()) {
-            putString(R.string.IP.toString(), networkManager.ip)
+            putString("ipPrefs", networkManager.ip)
             apply()
         }
+    }
+
+    private fun saveColorToPrefs() {
+        val sharedPrefs = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
+        with(sharedPrefs.edit()) {
+            putInt("colorPrefs", colorRaw)
+            apply()
+        }
+    }
+
+    private fun setIpFromPrefs(){
+        val sharedPrefs = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
+        val ipFromSharedPrefs = sharedPrefs.getString("ipPrefs", "192.168.1.200")
+        ipTextView.setText(ipFromSharedPrefs)
+        networkManager.ip = ipFromSharedPrefs!!
+    }
+
+    private fun setColorFromPrefs(){
+        val sharedPrefs = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
+        val colorFromSharedPrefs = sharedPrefs.getInt("colorPrefs", 0)
+        colorRaw = colorFromSharedPrefs
+        updateColorPicker()
+        updatePickerImage()
+    }
+
+    private fun updateButtons(){
+        fftBtn.setBackgroundColor(colorRaw)
+        saveBtn.setBackgroundColor(colorRaw)
+    }
+
+    private fun updateColorPicker(){
+        colorPicker.setColor(colorRaw)
+    }
+
+    private fun updatePickerImage(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            clrImageView.background.colorFilter =
+                BlendModeColorFilter(colorRaw, BlendMode.MULTIPLY)
+        else
+            clrImageView.background.setColorFilter(colorRaw, PorterDuff.Mode.MULTIPLY)
+    }
+
+    private fun updateInternalState() {
+        updateColors()
+        updatePickerImage()
+        updateButtons()
+        saveColorToPrefs()
+        setTextFieldValues()
+        networkManager.sendColorPost(colorR, colorG, colorB)
+    }
+
+    fun updateFromExternal(color : Int){
+        colorRaw = color
+        updateInternalState()
+        updateColorPicker()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -166,27 +207,17 @@ class ColorPickerFragment : Fragment() {
 
         fetchXmlElements(view)
 
-        val colorPicker: ColorPicker = view.findViewById(R.id.colorPicker)
+        colorPicker = view.findViewById(R.id.colorPicker)
         colorPicker.setColorSelectionListener(object : SimpleColorSelectionListener() {
             override fun onColorSelected(color: Int) {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                    clrImageView.background.colorFilter =
-                        BlendModeColorFilter(color, BlendMode.MULTIPLY)
-                else
-                    clrImageView.background.setColorFilter(color, PorterDuff.Mode.MULTIPLY)
-
                 colorRaw = color
-                updateState()
+                updateInternalState()
             }
         })
 
-        sharedPrefs = requireContext().getSharedPreferences("ipPref", Context.MODE_PRIVATE)
-        val ipFromSharedPrefs = sharedPrefs.getString(R.string.IP.toString(), "")
-
-        ipTextView.setText(ipFromSharedPrefs)
-        networkManager.ip = ipFromSharedPrefs!!
-
+        setIpFromPrefs()
+        setColorFromPrefs()
         attachTextColorListeners()
 
         //send post to esp for FFT
